@@ -1,0 +1,42 @@
+services:
+  open-webui:
+    ports:
+      - 5555:8080
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
+    volumes:
+      - ollama:/root/.ollama
+      - open-webui:/app/backend/data
+    container_name: open-webui
+    restart: always
+    image: ghcr.io/open-webui/open-webui:git-7bc88eb
+    depends_on:
+      - ollama
+  ollama:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - 11434:11434
+    container_name: ollama
+    image: ollama/ollama:0.1.48
+volumes:
+  ollama:
+    external: true
+    name: ollama
+  open-webui:
+    external: true
+    name: open-webui
